@@ -31,49 +31,19 @@
                 globalreqfullscreen.call(document.documentElement);
             });
             
-            document.addEventListener('keypress', function (e) {
-                if (e.keyCode == 49) {
-                    //1: basic black and white
-                    line_colour = rgb(255, 255, 255);
-                    gradient = ctx.createRadialGradient(w/2, h/2, w/2, w/2, h/2, w/4);
-                    gradient.addColorStop(1, rgb(255, 255, 255));
-                    gradient.addColorStop(0, rgb(235, 235, 235));
-                } else if (e.keyCode == 50) {
-                    //2: black and red
-                    line_colour = rgb(250, 0, 0);
-                    gradient = ctx.createRadialGradient(w/2, h/2, w/2, w/2, h/2, w/4);
-                    gradient.addColorStop(1, rgb(255, 120, 0));
-                    gradient.addColorStop(0, rgb(255, 0, 0));
-                    
-                } else if (e.keyCode == 55) {
-                    //x: symmetry number: 2
-                    symmetry_num = 2;
-                } else if (e.keyCode == 56) {
-                    //x: symmetry number: 4
-                    symmetry_num = 4;
-                } else if (e.keyCode == 57) {
-                    //x: symmetry number: 8
-                    symmetry_num = 8;
-                } else if (e.keyCode == 48) {
-                    //x: symmetry number: 16
-                    symmetry_num = 16;
-                }
-                
-            }, false);
-            
             
             //set to 128 for digitised effect, otherwise 512 is smooth
-            var mic = new Microphone(512);
+            var mic = new Microphone(256);
             
             //number of lines of symmetry
             var symmetry_num = 8;
             
             //particles
             var particles = [];
-            var num_particles = 32;
-            var radius = 300;
+            var num_particles = 96;
+            var radius = h / 3;
             var particle_size = 5;
-            var max_distance = 100;
+            var max_distance = 0;
     
             //initial colours
             var line_colour = rgb(255, 255, 255);
@@ -124,6 +94,7 @@
             
             
             function drawConnections(particle) {
+                max_distance = map(mic.getRMS(mic.spectrum), 0, 100, 0, h / 70) ** 2;
                 for (i = 0; i < num_particles; i++) {
                     for (j = 0; j < num_particles; j++) {
                         p1 = particles[i];
@@ -144,17 +115,30 @@
             //requests animation frame
             function draw() {
                 frameRate = 120;
-                  
-                if (mic.getRMS(mic.spectrum) > mic.peak_volume - 20) {
-                    ctx.lineWidth = 1000;
-                    ctx.strokeStyle = rgb(0);
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, w, h);
-                } else {
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = line_colour;
-                    ctx.background(0, map(mic.getRMS(mic.spectrum), 0, 100, 0.25, 0.05));
+                volume = mic.getRMS(mic.spectrum);
+                peak_vol = mic.peak_volume;
+
+                if (volume < peak_vol - 50) {
+                    symmetry_num = 4;
+                    line_colour = rgb(255, 255, 255);
+                    background_colour = 0;
+                    ctx.background(background_colour, map(volume, 0, 100, 0.25, 0.02));
+                } else if (volume < peak_vol - 35) {
+                    symmetry_num = 8;
+                    line_colour = rgb(255, 255, 255);
+                    background_colour = 0;
+                    ctx.background(background_colour, map(volume, 0, 100, 0.25, 0.02));
+                } else if (volume > peak_vol - 20) {
+                    symmetry_num = 16;
+                    line_colour = rgb(0, 0, 0);
+                    background_colour = 255;
+                    ctx.background(background_colour, 1);
                 }
+
+                ctx.strokeStyle = line_colour;
+
+                drawParticles();
+                drawConnections();
                 
                 drawParticles();
                 drawConnections();
