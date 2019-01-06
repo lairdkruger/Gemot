@@ -31,36 +31,6 @@
                 globalreqfullscreen.call(document.documentElement);
             });
             
-            document.addEventListener('keypress', function (e) {
-                if (e.keyCode == 49) {
-                    //1: basic black and white
-                    line_colour = rgb(255, 255, 255);
-                    gradient = ctx.createRadialGradient(w/2, h/2, w/2, w/2, h/2, w/4);
-                    gradient.addColorStop(1, rgb(255, 255, 255));
-                    gradient.addColorStop(0, rgb(235, 235, 235));
-                } else if (e.keyCode == 50) {
-                    //2: black and red
-                    line_colour = rgb(250, 0, 0);
-                    gradient = ctx.createRadialGradient(w/2, h/2, w/2, w/2, h/2, w/4);
-                    gradient.addColorStop(1, rgb(255, 120, 0));
-                    gradient.addColorStop(0, rgb(255, 0, 0));
-                    
-                } else if (e.keyCode == 55) {
-                    //x: symmetry number: 2
-                    symmetry_num = 2;
-                } else if (e.keyCode == 56) {
-                    //x: symmetry number: 4
-                    symmetry_num = 4;
-                } else if (e.keyCode == 57) {
-                    //x: symmetry number: 8
-                    symmetry_num = 8;
-                } else if (e.keyCode == 48) {
-                    //x: symmetry number: 16
-                    symmetry_num = 16;
-                }
-                
-            }, false);
-            
             
             //set to 128 for digitised effect, otherwise 512 is smooth
             var mic = new Microphone(256);
@@ -70,7 +40,7 @@
             
             //particles
             var particles = [];
-            var num_particles = 64;
+            var num_particles = 96;
             var radius = h / 3;
             var particle_size = 5;
             var max_distance = 0;
